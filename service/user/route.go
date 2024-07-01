@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
+	"go-api/config"
 	"go-api/service/auth"
 	"go-api/types"
 	"go-api/utils"
@@ -25,38 +26,73 @@ func (handler *Handler) RegisterRouters(router *mux.Router) {
 }
 
 func (handler *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
-	// handle login
-}
-
-func (handler *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
-	var user types.RegisterUserPayload
-	if err := utils.ParseJSON(r, &user); err != nil {
+	var payload types.LoginUserPayload
+	if err := utils.ParseJSON(r, &payload); err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	if err := utils.Validate.Struct(user); err != nil {
+	if err := utils.Validate.Struct(payload); err != nil {
 		var errValidation validator.ValidationErrors
 		errors.As(err, &errValidation)
 		utils.WriteError(w, http.StatusBadRequest, errValidation)
 	}
 
-	_, err := handler.store.GetUserByEmail(user.Email)
-	if err == nil {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("user with email %s already exists", user.Email))
+	user, err := handler.store.GetUserByEmail(payload.Email)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("not found, invalid email or password"))
 		return
 	}
 
-	hashedPassword, err := auth.HashPassword(user.Password)
+	if !auth.ComparePassword(user.Password, []byte(payload.Password)) {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("not found, invalid email or password"))
+		return
+	}
+
+	secret := []byte(config.Envs.JWTSecret)
+	token, err := auth.CreateJWT(secret, user.ID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("error creating jwt token"))
+		return
+
+	}
+
+	err = utils.WriteJSON(w, http.StatusCreated, map[string]string{"token": token})
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+}
+
+func (handler *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
+	var payload types.RegisterUserPayload
+	if err := utils.ParseJSON(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := utils.Validate.Struct(payload); err != nil {
+		var errValidation validator.ValidationErrors
+		errors.As(err, &errValidation)
+		utils.WriteError(w, http.StatusBadRequest, errValidation)
+	}
+
+	_, err := handler.store.GetUserByEmail(payload.Email)
+	if err == nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("user with email %s already exists", payload.Email))
+		return
+	}
+
+	hashedPassword, err := auth.HashPassword(payload.Password)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	err = handler.store.CreateUser(types.User{
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		Email:     user.Email,
+		FirstName: payload.FirstName,
+		LastName:  payload.LastName,
+		Email:     payload.Email,
 		Password:  hashedPassword,
 	})
 	if err != nil {
