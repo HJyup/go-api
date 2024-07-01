@@ -69,18 +69,14 @@ func TestUserServiceHandlers(t *testing.T) {
 
 type mockUserStore struct{}
 
-func (m *mockUserStore) UpdateUser(u types.User) error {
-	return nil
-}
-
-func (m *mockUserStore) GetUserByEmail(email string) (*types.User, error) {
+func (m *mockUserStore) GetUserByEmail(_ string) (*types.User, error) {
 	return &types.User{}, fmt.Errorf("error with email")
 }
 
-func (m *mockUserStore) CreateUser(u types.User) error {
+func (m *mockUserStore) CreateUser(_ types.User) error {
 	return nil
 }
 
-func (m *mockUserStore) GetUserByID(id int) (*types.User, error) {
+func (m *mockUserStore) GetUserByID(_ int) (*types.User, error) {
 	return &types.User{}, nil
 }
