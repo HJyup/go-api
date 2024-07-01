@@ -4,8 +4,8 @@
 < {%
     const firstName = `FirstName_${$random.uuid}`;
     const lastName = `LastName_${$random.uuid}`;
-    const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`;
-    const password = `Pass_${$random.uuid}`;
+    const email = $random.email;
+    const password = `Pass_${$random.uuid.slice(0, 10)}`;
     request.variables.set("firstName", firstName);
     request.variables.set("lastName", lastName);
     request.variables.set("email", email);
