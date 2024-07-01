@@ -1,13 +1,26 @@
-### POST request to create a new user
+### User API
+
+### POST request to register
+< {%
+    const firstName = `FirstName_${$random.uuid}`;
+    const lastName = `LastName_${$random.uuid}`;
+    const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`;
+    const password = `Pass_${$random.uuid}`;
+    request.variables.set("firstName", firstName);
+    request.variables.set("lastName", lastName);
+    request.variables.set("email", email);
+    request.variables.set("password", password);
+%}
 POST http://localhost:8080/api/v1/register
 Content-Type: application/json
 
 {
-  "first_name": "Jon",
-  "last_name": "Don",
-  "email": "joh.don@gmail.com",
-  "password": "123456BJK"
+  "first_name": "{{firstName}}",
+  "last_name": "{{lastName}}",
+  "email": "{{email}}",
+  "password": "{{password}}"
 }
+
 
 ###
 
@@ -16,8 +29,8 @@ POST http://localhost:8080/api/v1/login
 Content-Type: application/json
 
 {
-  "email": "joh.don@gmail.com",
-  "password": "123456BJK"
+  "email": "{{email}}",
+  "password": "{{password}}"
 }
 
 ###

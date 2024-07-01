@@ -1,0 +1,33 @@
+### Products API
+
+### POST products
+< {%
+    const productName = `Product_${$random.uuid}`;
+    const productDescription = "Bread is a staple food prepared from a dough of flour and water, usually by baking.";
+    const productPrice = $random.float(1, 10);
+    const productQuantity = $random.integer(1, 100);
+    request.variables.set("productName", productName);
+    request.variables.set("productDescription", productDescription);
+    request.variables.set("productPrice", productPrice);
+    request.variables.set("productQuantity", productQuantity);
+%}
+POST http://localhost:8080/api/v1/products
+Content-Type: application/json
+
+{
+  "name": "{{productName}}",
+  "Description": "{{productDescription}}",
+  "price": {{productPrice}},
+  "quantity": {{productQuantity}}
+}
+
+###
+
+### GET products
+GET http://localhost:8080/api/v1/products
+Content-Type: application/json
+
+{}
+
+###
+

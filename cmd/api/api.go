@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"github.com/gorilla/mux"
+	"go-api/service/product"
 	"go-api/service/user"
 	"log"
 	"net/http"
@@ -27,6 +28,10 @@ func (server *Server) Run() error {
 	userStore := user.NewStore(server.db)
 	userHandler := user.NewHandler(userStore)
 	userHandler.RegisterRouters(subrouter)
+
+	productStore := product.NewStore(server.db)
+	productHandler := product.NewHandler(productStore)
+	productHandler.RegisterRoutes(subrouter)
 
 	log.Println("Server is running on", server.address)
 
