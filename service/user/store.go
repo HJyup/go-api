@@ -51,19 +51,19 @@ func (store *Store) GetUserByID(id int) (*types.User, error) {
 		return nil, err
 	}
 
-	u := new(types.User)
+	user := new(types.User)
 	for rows.Next() {
-		u, err = scanRowIntoUser(rows)
+		user, err = scanRowIntoUser(rows)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if u.ID == 0 {
+	if user.ID == 0 {
 		return nil, fmt.Errorf("user not found")
 	}
 
-	return u, nil
+	return user, nil
 }
 
 func scanRowIntoUser(rows *sql.Rows) (*types.User, error) {

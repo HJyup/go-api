@@ -7,13 +7,6 @@ type ProductStore interface {
 	CreateProduct(Product) error
 }
 
-type CreateProductPayload struct {
-	Name        string  `json:"name" validate:"required"`
-	Description string  `json:"description" validate:"required"`
-	Price       float64 `json:"price" validate:"required"`
-	Quantity    int     `json:"quantity" validate:"required"`
-}
-
 type Product struct {
 	ID          int       `json:"id"`
 	Name        string    `json:"name"`
@@ -22,4 +15,11 @@ type Product struct {
 	Price       float64   `json:"price"`
 	Quantity    int       `json:"quantity"`
 	CreatedAt   time.Time `json:"created_at"`
+}
+
+type CreateProductPayload struct {
+	Name        string  `json:"name" validate:"required"`
+	Description string  `json:"description" validate:"required"`
+	Price       float64 `json:"price" validate:"required"`
+	Quantity    int     `json:"quantity" validate:"required"`
 }
