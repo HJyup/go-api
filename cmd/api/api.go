@@ -30,7 +30,7 @@ func (server *Server) Run() error {
 	userHandler.RegisterRouters(subrouter)
 
 	productStore := product.NewStore(server.db)
-	productHandler := product.NewHandler(productStore)
+	productHandler := product.NewHandler(productStore, userStore)
 	productHandler.RegisterRoutes(subrouter)
 
 	log.Println("Server is running on", server.address)
