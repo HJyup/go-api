@@ -3,6 +3,7 @@ package product
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"go-api/types"
 	"net/http"
@@ -12,7 +13,8 @@ import (
 
 func TestProductServiceHandlers(t *testing.T) {
 	productStore := &mockProductStore{}
-	handler := NewHandler(productStore)
+	userStore := &mockUserStore{}
+	handler := NewHandler(productStore, userStore)
 
 	t.Run("should fail if the user create product payload is invalid", func(t *testing.T) {
 		user := types.CreateProductPayload{
@@ -73,4 +75,18 @@ func (m *mockProductStore) GetProducts() ([]types.Product, error) {
 
 func (m *mockProductStore) CreateProduct(_ types.Product) error {
 	return nil
+}
+
+type mockUserStore struct{}
+
+func (m *mockUserStore) GetUserByEmail(_ string) (*types.User, error) {
+	return &types.User{}, fmt.Errorf("error with email")
+}
+
+func (m *mockUserStore) CreateUser(_ types.User) error {
+	return nil
+}
+
+func (m *mockUserStore) GetUserByID(_ int) (*types.User, error) {
+	return &types.User{}, nil
 }
