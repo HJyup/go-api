@@ -24,13 +24,27 @@ Content-Type: application/json
 
 ###
 
+### POST request to register (testUser)
+POST http://localhost:8080/api/v1/register
+Content-Type: application/json
+
+{
+  "first_name": "testUser",
+  "last_name": "testUser",
+  "email": "testUser@test.com",
+  "password": "testUser123"
+}
+
+
+###
+
 ### GET request to login
 POST http://localhost:8080/api/v1/login
 Content-Type: application/json
 
 {
-  "email": "{{email}}",
-  "password": "{{password}}"
+  "email": "testUser@test.com",
+  "password": "testUser123"
 }
 
 ###

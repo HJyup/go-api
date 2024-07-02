@@ -4,26 +4,28 @@ import (
 	"errors"
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
+	"go-api/service/auth"
 	"go-api/types"
 	"go-api/utils"
 	"net/http"
 )
 
 type Handler struct {
-	store types.ProductStore
+	productStore types.ProductStore
+	userStore    types.UserStore
 }
 
-func NewHandler(store types.ProductStore) *Handler {
-	return &Handler{store: store}
+func NewHandler(productStore types.ProductStore, userStore types.UserStore) *Handler {
+	return &Handler{productStore: productStore, userStore: userStore}
 }
 
 func (handler *Handler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/products", handler.handleGetProducts).Methods(http.MethodGet)
-	router.HandleFunc("/products", handler.handleCreateProduct).Methods(http.MethodPost)
+	router.HandleFunc("/products", auth.WithJWTAuth(handler.handleCreateProduct, handler.userStore)).Methods(http.MethodPost)
 }
 
 func (handler *Handler) handleGetProducts(w http.ResponseWriter, _ *http.Request) {
-	products, err := handler.store.GetProducts()
+	products, err := handler.productStore.GetProducts()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -49,7 +51,7 @@ func (handler *Handler) handleCreateProduct(w http.ResponseWriter, r *http.Reque
 		utils.WriteError(w, http.StatusBadRequest, errValidation)
 	}
 
-	err := handler.store.CreateProduct(types.Product{
+	err := handler.productStore.CreateProduct(types.Product{
 		Name:        payload.Name,
 		Description: payload.Description,
 		Price:       payload.Price,
